@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { firebaseAuth } from './firebase';
 import { AGE_BANDS, AVATARS, isValidNickname, type AgeBand, type Avatar, type ChildProfile } from './profile/types';
 import { deviceStorage } from './storage/storage';
+import { placeholderEngine } from './maths/engine';
+import { ChapterList } from './screens/ChapterList';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -12,6 +14,7 @@ export default function App() {
   const [nickname, setNickname] = useState('');
   const [ageBand, setAgeBand] = useState<AgeBand>('5-6');
   const [avatar, setAvatar] = useState<Avatar>(AVATARS[0]);
+  const [activeChild, setActiveChild] = useState<ChildProfile | null>(null);
 
   useEffect(() => onAuthStateChanged(firebaseAuth, setUser), []);
 
@@ -36,6 +39,8 @@ export default function App() {
               Parent: sign in with Google
             </Button>
           </Paper>
+        ) : activeChild ? (
+          <ChapterList child={activeChild} engine={placeholderEngine} onBack={() => setActiveChild(null)} />
         ) : (
           <>
             <Group justify="space-between">
@@ -64,7 +69,10 @@ export default function App() {
 
             {profiles.map((p) => (
               <Paper key={p.id} withBorder p="md">
-                <Text>{p.avatar} {p.nickname} (ages {p.ageBand})</Text>
+                <Group justify="space-between">
+                  <Text>{p.avatar} {p.nickname} (ages {p.ageBand})</Text>
+                  <Button onClick={() => setActiveChild(p)}>Maths chapters</Button>
+                </Group>
               </Paper>
             ))}
           </>
