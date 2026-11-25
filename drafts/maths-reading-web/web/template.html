@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yaanstep maths draft (private preview)</title>
+<style>
+:root{--bg:#f4fbf8;--ink:#17332c;--teal:#1d8a76;--card:#fff;--line:#c6e3da}
+*{box-sizing:border-box}body{margin:0;font:18px/1.45 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:680px;margin:0 auto;padding:16px}h1{font-size:1.35rem;margin:.2em 0}
+.card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.note{font-size:.85rem;background:#fff7e0;border:1px solid #ecd48a;border-radius:10px;padding:8px 12px}
+button{font:inherit;cursor:pointer;min-height:48px;min-width:48px;border-radius:14px;border:2px solid var(--teal);background:#fff;color:var(--ink);padding:8px 16px}
+button:focus-visible{outline:4px solid #f0a500;outline-offset:2px}
+button.primary{background:var(--teal);color:#fff;font-weight:600}.chip[aria-pressed=true]{background:var(--teal);color:#fff}
+#play .chosen{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.big{min-height:64px;font-size:1.15rem}
+.parent{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:.85rem;color:#51675f}.small{min-height:40px;font-size:.85rem;border-color:#aab9b3}.danger{border-color:#b3261e;color:#b3261e}
+#bands{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.stats{display:flex;gap:24px;font-weight:600}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+#q{font-size:1.5rem;font-weight:700;margin:.4em 0}#art{display:flex;gap:14px;flex-direction:column;margin:10px 0}
+.grp{display:flex;flex-wrap:wrap;gap:6px;width:100%;padding:8px;border:2px dashed var(--line);border-radius:12px}
+.obj{position:relative;min-width:56px;min-height:64px;padding:4px;border-radius:14px;border:3px solid transparent;background:#fff;display:flex;flex-direction:column;align-items:center}
+.obj.static{pointer-events:none;border-color:transparent}.obj.on{border-color:#f0a500;background:#fff4d6}.obj.slot{border-style:dashed;border-color:var(--teal);justify-content:center}.plus{font-weight:700;font-size:1.2rem;color:var(--teal);min-height:48px;display:flex;align-items:center}
+.num{font-size:1.1rem;font-weight:700;min-height:1.3em}
+.card{width:100%;padding:6px;border-radius:18px;border:3px solid var(--teal);background:#fff}.card:active{background:#e7f6f1}
+#bar{display:flex;gap:6px;margin:10px 0}.seg{flex:1;height:16px;border-radius:8px;background:#dfeee9;border:2px solid var(--line)}.seg.done{background:var(--teal);border-color:var(--teal)}.seg.now{background:#fff4d6;border-color:#f0a500}
+.seg.miss{background:repeating-linear-gradient(45deg,#9a7fd1,#9a7fd1 6px,#7d5fba 6px,#7d5fba 12px);border-color:#6a4aa8}.seg.miss.now{border-color:#6a4aa8;box-shadow:0 0 0 2px #f0a500}
+#msg .good{font-size:1.6rem;font-weight:800;color:#1b7a3d;background:#e6f6ea;border:2px solid #7bc48f;border-radius:14px;padding:10px 14px;text-align:center}
+#msg .tick{display:inline-block;background:#1b7a3d;color:#fff;border-radius:50%;width:1.5em;height:1.5em;line-height:1.5em;margin-right:.3em}
+#msg .wait{display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:600;color:#51675f}
+.spin{width:18px;height:18px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;display:inline-block}
+@media (prefers-reduced-motion:no-preference){.spin{animation:sp .8s linear infinite}#msg .good{animation:pop .25s ease-out}}
+@keyframes sp{to{transform:rotate(360deg)}}@keyframes pop{from{transform:scale(.9);opacity:.4}to{transform:scale(1);opacity:1}}
+#art:empty,#count:empty{display:none}
+#opts.balloons{grid-template-columns:repeat(2,1fr);gap:16px 12px;padding-top:6px}
+.balloon{position:relative;min-height:96px;border:0;background:var(--bc);color:#fff;border-radius:50% 50% 48% 48% / 58% 58% 42% 42%;box-shadow:inset -8px -8px 0 rgba(0,0,0,.12);font-size:1.9rem}
+.balloon::after{content:"";position:absolute;left:50%;bottom:-14px;width:2px;height:14px;background:#8a9b95}.balloon:disabled{opacity:.35}
+.balloon:focus-visible{outline:4px solid #f0a500;outline-offset:3px}
+.frame{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:10px;border:3px solid var(--teal);border-radius:14px;background:#fff}
+.cell{min-height:56px;border-radius:50%;border:3px solid var(--line);background:#f4fbf8}.cell.on{background:#e8781f;border-color:#b85a10}
+.line{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}.bead{text-align:center;font-size:.8rem;font-weight:700;padding:8px 0;border-radius:50%;background:#e7f6f1;border:2px solid var(--line)}
+.bead.here{background:#e8781f;color:#fff;border-color:#b85a10;transform:scale(1.1)}.hopbar{display:flex;align-items:center;gap:10px;margin-top:6px}.hopbar button{min-height:48px;font-size:1rem}
+#count{font-size:3rem;font-weight:800;color:var(--teal);min-height:1.2em;text-align:center}
+#opts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}.opt{font-size:1.6rem;min-height:72px;font-weight:700}
+.opt:disabled{opacity:.45}#msg{min-height:3.5em;font-weight:600;margin:8px 0}.top{display:flex;justify-content:space-between;align-items:center}
+@media (prefers-reduced-motion:no-preference){.opt:active{transform:scale(.98)}}
+.vrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:center}.sign{font-size:2rem;font-weight:800;color:var(--teal)}.obj.cross{opacity:.35;position:relative}.obj.cross::after{content:"✕";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#b3261e;opacity:1}
+.bigtxt{font-size:2rem;font-weight:800;text-align:center;padding:14px 6px;background:#fff;border:2px solid var(--line);border-radius:14px;overflow-wrap:anywhere}
+.cell.on2{background:#2f6fd0;border-color:#1f4f99}.bead.goal{background:#2e9c57;color:#fff;border-color:#1b7a3d}.cap{margin:6px 0 0;font-weight:600;text-align:center}
+.bm{border:3px solid var(--teal);border-radius:14px;overflow:hidden;background:#fff}.bmtop{text-align:center;font-size:1.6rem;font-weight:800;padding:8px;background:#e7f6f1;border-bottom:3px solid var(--teal)}.bmrow{display:flex}.bmp{text-align:center;font-size:1.5rem;font-weight:800;padding:12px 4px;border-right:3px solid var(--teal);background:#fff}.bmp:last-child{border-right:0}.unk{background:#fff4d6!important;color:#b85a10}
+.arr{display:grid;gap:6px;padding:10px;border:2px dashed var(--line);border-radius:12px;max-width:340px;margin:0 auto}.dot{width:100%;aspect-ratio:1;max-width:28px;border-radius:50%;background:#e8781f;justify-self:center}
+.cmp div{display:flex;align-items:center;gap:8px;margin:6px 0}.cmp span{min-width:2.2em;font-weight:800;font-size:1.3rem}.cmp i{display:block;height:28px;background:var(--teal);border-radius:8px}
+.endbtns{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}#opts .small{grid-column:1/-1}.opt.primary{background:var(--teal);color:#fff}
+.chrow{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;margin:8px 0;font-size:1.05rem}.sr{position:absolute;left:-9999px}
+.vrow .grp{width:auto;flex:0 1 auto;max-width:100%;justify-content:center}
+.blocks{display:grid;grid-template-rows:repeat(5,1fr);grid-auto-flow:column;grid-template-columns:repeat(2,64px);gap:6px;padding:10px;border:3px solid var(--teal);border-radius:14px;background:#fff;width:max-content;margin:0 auto}
+.blk{width:64px;height:34px;border-radius:8px;border:3px solid var(--line);background:#f4fbf8}.blk.ba{background:#e8781f;border-color:#b85a10}.blk.bb{background:#2f6fd0;border-color:#1f4f99}.blk.bx{background:#fff;border:3px dashed #b3261e;position:relative}.blk.bx::after{content:"✕";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#b3261e;font-weight:800}
+.money{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding:10px;background:#fff;border:2px dashed var(--line);border-radius:14px}.clockbox{display:flex;justify-content:center;padding:6px}
+.garden{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;font-size:2rem;margin:10px 0}.gtxt{margin:6px 0;font-size:.95rem}.pl.more{font-size:.9rem;align-self:center}.stretch{font-size:4rem;text-align:center;margin:10px 0}
+</style></head><body><main>
+<h1>Yaanstep maths (draft preview)</h1>
+<p class="note">Private draft for Manish's visual check. Not reviewed, not tested by QA, not for children yet. Progress is kept only in this browser. Puzzle graphics are simple shapes drawn here. This is a working draft of the team (AI agents); the reward numbers are placeholders.</p>
+<section id="menu"><div class="card"><div class="stats"><span>Points: <b id="pts">0</b></span><span hidden>Day streak: <b id="streak">0</b></span></div>
+<p><b>Pick an age band to start playing:</b></p><div id="bands" role="group" aria-label="Age band"></div></div>
+<div class="parent"><p>Parent area</p><p>Questions in each set (a short break comes halfway in 10 and 15)</p><div class="row" id="setlen" role="group" aria-label="Questions in each set"></div><button id="reset" class="small">Reset my progress…</button>
+<div id="confirm" role="alertdialog" aria-label="Confirm reset" hidden><p><b>Delete all points, garden and stars on this device?</b> This cannot be undone.</p>
+<div class="row"><button id="keep" class="primary">No, keep my progress</button><button id="wipe" class="danger">Yes, delete everything</button></div></div></div></section>
+<section id="game" hidden><div class="card"><div class="top"><span><b id="who"></b> · <span id="prog" aria-live="polite"></span></span><span><button id="chbtn" class="small">Chapters</button> <button id="exit">Exit</button></span></div>
+<div id="bar" role="img" aria-label="Your recent answers"></div><div id="q" role="heading" aria-level="2"></div><button id="say" aria-label="Read it to me">🔊 Hear it</button><div id="art"></div><div id="count" aria-live="polite"></div>
+<div id="msg" aria-live="polite"></div><div id="opts"></div></div></section>
+<section id="chaps" hidden><div class="card"><div class="top"><b id="chtitle"></b><button id="chback">Back</button></div><p>Pick any chapter. Each one has a short lesson and then ten questions.</p><div id="chlist"></div></div></section>
+</main><script>/*APP*/</script></body></html>

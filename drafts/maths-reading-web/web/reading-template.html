@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yaanstep reading draft (private preview)</title>
+<style>
+:root{--bg:#f4fbf8;--ink:#17332c;--teal:#1d8a76;--card:#fff;--line:#c6e3da}
+*{box-sizing:border-box}body{margin:0;font:18px/1.45 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:680px;margin:0 auto;padding:16px}h1{font-size:1.35rem;margin:.2em 0}
+.card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.note{font-size:.85rem;background:#fff7e0;border:1px solid #ecd48a;border-radius:10px;padding:8px 12px}
+button{font:inherit;cursor:pointer;min-height:56px;min-width:56px;border-radius:14px;border:2px solid var(--teal);background:#fff;color:var(--ink);padding:8px 14px}
+button:focus-visible{outline:4px solid #f0a500;outline-offset:2px}button.primary{background:var(--teal);color:#fff;font-weight:600}
+.small{min-height:44px;font-size:.85rem;border-color:#aab9b3}.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.steps{display:grid;gap:10px}.step{display:flex;justify-content:space-between;align-items:center;text-align:left;min-height:72px;font-size:1.1rem}.step small{color:#51675f;display:block}
+.parent{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:.85rem;color:#51675f}.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.row button[aria-pressed=true]{background:var(--teal);color:#fff}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:12px;margin:12px 0}
+.tile{min-height:104px;font-size:2.2rem;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-width:3px}
+.tile.on{background:#fff4d6;border-color:#f0a500}.tile .w{font-size:1rem;font-weight:600}.tile svg{width:64px;height:64px}
+.sub{font-size:1rem;color:#51675f;font-weight:600;min-height:1.5em;text-align:center}
+.wcard{border:2px solid var(--line);border-radius:14px;padding:10px;margin:10px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wcard .let{min-width:60px;min-height:64px;font-size:2rem;font-weight:800}.wcard .whole{margin-left:auto;font-size:1.5rem;font-weight:800;min-width:96px}
+.word{font-size:1.6rem;font-weight:800}
+.done{background:#e6f6ea;border:3px solid #7bc48f;border-radius:16px;padding:18px;text-align:center;margin:12px 0}.done b{font-size:1.5rem;display:block;margin-bottom:8px}
+#novoice{display:none}
+</style></head><body><main>
+<h1>Yaanstep reading (draft preview)</h1>
+<p class="note">Private draft for Manish's visual check. Not reviewed by Leela, Hiroshi or Camille, not tested by QA, not tested with any child. Pictures are simple original drawings made for this draft. This is a working draft of the team (AI agents). Nothing is recorded: no microphone, no camera, no child text.</p>
+<p id="novoice" class="note">No built-in voice was found on this device, so words show without sound. A parent can try another browser.</p>
+<section id="menu"><div class="card"><p><b>Tap a step to play:</b></p><div class="steps" id="steps"></div></div>
+<div class="parent"><p>Parent area</p><p>Voice speed</p><div class="row" id="speed" role="group" aria-label="Voice speed"></div><p>Voice (a browser cannot tell a voice's gender, so this is a guess from the name; choose by ear)</p><div class="row"><select id="voicesel" aria-label="Voice"></select><button class="small" id="hear">Hear it</button></div><p>The maths page uses the same voice.</p><p>Note: a computer voice may say a letter's name instead of its sound (for example "ess" instead of /s/). If so, say the sound yourself. Recorded sounds are not added yet.</p><p>Break screen after this many taps</p><div class="row" id="limit" role="group" aria-label="Taps before break screen"></div></div></section>
+<section id="game" hidden><div class="card"><div class="top"><b id="title"></b><button id="exit" class="small">Back</button></div><div id="sub" class="sub" aria-live="polite"></div><div id="area"></div><div class="row"><button id="more" class="primary">More</button></div></div><div id="alldone" class="done" hidden><b>All done for now!</b>Great playing. Time for a break.<div class="row" style="justify-content:center"><button id="keep">Keep playing</button><button id="stop" class="primary">Finish</button></div></div></section>
+</main><script>/*APP*/</script></body></html>

@@ -1,0 +1,8 @@
+{
+  "name": "sprouts-core",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-strip-types src/maths.test.ts && node --experimental-strip-types src/picture.test.ts && node --experimental-strip-types src/points.test.ts && node --experimental-strip-types src/progression.test.ts && node --experimental-strip-types src/games.test.ts && node --experimental-strip-types src/reading.test.ts && node --experimental-strip-types src/measure.test.ts && node --experimental-strip-types src/chapters.test.ts && node --experimental-strip-types src/distinct.test.ts && node --experimental-strip-types src/voice.test.ts"
+  }
+}

@@ -1,0 +1,10 @@
+import assert from 'node:assert';
+import { LETTER_SETS, letterSpeech, PICTURE_SETS, BLEND_SETS, BLEND_LETTER_SETS, COMMON, DRAWINGS } from './reading.ts';
+const letters = LETTER_SETS.flat().map(x => x.l); assert.equal(letters.length, 26); assert.equal(new Set(letters).size, 26); assert.equal(letters.join('').split('').sort().join(''), 'abcdefghijklmnopqrstuvwxyz');
+assert.equal(letterSpeech(LETTER_SETS[0][0]), 's, as in sun'); assert.ok(LETTER_SETS.flat().every(x => x.word.length > 1));
+const pics = PICTURE_SETS.flat(); assert.equal(pics.length, 20); assert.equal(new Set(pics).size, 20); for (const w of pics) assert.ok(DRAWINGS[w] && DRAWINGS[w].length > 40, `drawing for ${w}`);
+assert.deepEqual(Object.keys(DRAWINGS).sort(), [...pics].sort());
+BLEND_SETS.forEach((set, i) => { assert.equal(set.length, 10); assert.equal(new Set(set).size, 10); const allowed = new Set(BLEND_LETTER_SETS[i].flatMap(k => LETTER_SETS[k].map(x => x.l))); for (const w of set) { assert.equal(w.length, 3, w); for (const ch of w) assert.ok(allowed.has(ch), `${w}: ${ch} not yet taught in set ${i + 1}`); } });
+assert.equal(COMMON.length, 20); assert.equal(new Set(COMMON.map(c => c[0])).size, 20);
+const banned = [/mum/i, /come with me/i, /i see you/i, /\bcot\b/i, /\bfig\b/i]; for (const t of [...COMMON.flat(), ...BLEND_SETS.flat(), ...pics]) for (const b of banned) assert.ok(!b.test(t), `banned wording: ${t}`);
+console.log('ALL PASS (reading mode A content)');

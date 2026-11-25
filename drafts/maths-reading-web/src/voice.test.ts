@@ -1,0 +1,12 @@
+import assert from 'node:assert';
+import { chooseVoice, isFemaleName, isMaleName } from './voice.ts';
+const v = (name: string, lang = 'en-US', localService = true) => ({ name, lang, localService });
+assert.ok(isFemaleName('Microsoft Zira - English (United States)')); assert.ok(isFemaleName('Google UK English Female')); assert.ok(isMaleName('Microsoft David - English (United States)')); assert.ok(!isMaleName('Google UK English Female'));
+assert.equal(chooseVoice([v('Microsoft David'), v('Microsoft Zira')], '')!.name, 'Microsoft Zira');
+assert.equal(chooseVoice([v('Microsoft David'), v('Microsoft Zira')], 'Microsoft David')!.name, 'Microsoft David', 'parent choice wins');
+assert.equal(chooseVoice([v('Microsoft David'), v('English United States')], '')!.name, 'English United States', 'unknown name beats a male-named one');
+assert.equal(chooseVoice([v('Microsoft David')], '')!.name, 'Microsoft David', 'only voice is still used');
+assert.equal(chooseVoice([v('Zira', 'en-US', false), v('Samantha', 'fr-FR')], ''), null, 'online or non-English voices are never used');
+assert.equal(chooseVoice([v('Moira', 'en-IE'), v('Samantha', 'en-US')], '')!.name, 'Samantha', 'US English preferred among female');
+assert.equal(chooseVoice([v('Microsoft David'), v('Microsoft Mark'), v('Microsoft Guy')], '')!.name, 'Microsoft Mark', 'Mark preferred over other male voices');
+console.log('ALL PASS (voice choice)');
