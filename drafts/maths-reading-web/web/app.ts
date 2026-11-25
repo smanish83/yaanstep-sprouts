@@ -28,7 +28,7 @@ const PRAISE = ['Good job!', 'Great work!', 'Well done!', 'Super!', 'Brilliant!'
 const HINTS: Record<string, string> = {
   add: 'Start at the first number and count up.', subtract: 'Start at the first number and count back.', multiply: 'Think of equal groups, like rows of dots.',
   divide: 'How many equal groups can you make?', missing: 'What do you add to the first number to reach the total?', compare: 'Which number comes later when you count?',
-  three: 'Add the first two, then add the last one.', order: 'Say the numbers in order from smallest to biggest.',
+  three: 'Add the first two, then add the last one.', double: 'Double means two of the same number. Add the number to itself.', half: 'Half means share into two equal groups.', maketen: 'Make 10 first, then add what is left over.', balance: 'Both sides of the equals sign are worth the same. Work out one side first.', family: 'Numbers in a family go together. Use the facts you know.', place: 'Look at which place the digit is in: ones, tens, hundreds.', fraction: 'Share the amount into equal groups, then count the groups you need.', word: 'Read it again. What do you know? What do you need to find?', barword: 'Draw a bar for each person. The extra part is the difference.', order: 'Say the numbers in order from smallest to biggest.',
   frame: 'Tap a circle to fill it. Tap it again to take it away.', count: 'Touch each shape once and count out loud.', more: 'Count each group. Which count is bigger?', onemore: 'Count them, then count one more.'
 };
 function hintFor(k: string): string {
@@ -148,6 +148,7 @@ function renderMeas(p: MeasPuzzle) {
 // ---- tutorial player: concrete objects, then pictures, then numbers ----
 function visual(v: V): string {
   if (v.t === 'none') return '';
+  if (v.t === 'balance') return `<div class="bal" aria-hidden="true"><div class="pan">${v.left}</div><div class="eq">=</div><div class="pan">${v.right}</div></div>`;
   if (v.t === 'text') return `<div class="bigtxt">${v.big}</div>`;
   if (v.t === 'objects') {
     const parts = v.parts.map(p => `<div class="grp">${Array.from({ length: p.n }, (_, k) => { const x = !!p.crossed && k >= p.n - p.crossed; const sv = shapeSvg(p.shape, p.color, 40);
@@ -280,3 +281,6 @@ $('wipe').onclick = async () => { garden = { w: 0, d: -1 }; chDone = {}; saveGar
 
 { const box = document.getElementById('setlen'); if (box) { box.innerHTML = SET_LENGTHS.map(n => `<button class="small${n === setLen ? ' primary' : ''}" data-n="${n}" aria-pressed="${n === setLen}">${n} questions</button>`).join('');
   box.querySelectorAll<HTMLButtonElement>('button').forEach(b => b.onclick = () => { setLen = +b.dataset.n!; try { kv.setItem('set-len', String(setLen)); } catch {} box.querySelectorAll<HTMLButtonElement>('button').forEach(x => { const on = +x.dataset.n! === setLen; x.className = 'small' + (on ? ' primary' : ''); x.setAttribute('aria-pressed', String(on)); }); }); } }
+
+// Offline after the first visit (only on the hosted page; ignored when opened as a file).
+try { if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('/sw.js').catch(() => {}); } catch { /* no offline cache */ }

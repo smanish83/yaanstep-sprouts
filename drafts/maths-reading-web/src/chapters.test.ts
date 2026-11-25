@@ -8,7 +8,7 @@ for (const b of BANDS) for (const ch of CHAPTERS[b]) {
   const t = tutorialFor(ch); steps += t.length; assert.ok(t.length >= 3, `${ch.id} has a tutorial`);
   for (const s of t) {
     // every equation written in a tutorial must be arithmetically right
-    for (const m of (s.say + ' ' + (s.v.t === 'text' ? s.v.big : '')).matchAll(/(?<![+−×÷] )(\d+) ([+−×÷]) (\d+) = (\d+)/g)) { const a = +m[1], c = +m[3], r = +m[4]; const e = m[2] === '+' ? a + c : m[2] === '−' ? a - c : m[2] === '×' ? a * c : a / c; assert.equal(e, r, `${ch.id}: ${m[0]}`); }
+    for (const m of (s.say + ' ' + (s.v.t === 'text' ? s.v.big : '')).matchAll(/(?<![+−×÷] )(?<![\d,])(\d+) ([+−×÷]) (\d+) = (\d+)(?! [+−×÷] )/g)) { const a = +m[1], c = +m[3], r = +m[4]; const e = m[2] === '+' ? a + c : m[2] === '−' ? a - c : m[2] === '×' ? a * c : a / c; assert.equal(e, r, `${ch.id}: ${m[0]}`); }
     if (s.v.t === 'bar' && s.v.total !== null && s.v.a !== null && s.v.b !== null) assert.equal(s.v.a + s.v.b, s.v.total, `${ch.id} bar parts`);
     if (s.v.t === 'line') { assert.ok(s.v.a >= 1 && s.v.a <= 20); const e = s.v.op === '+' ? s.v.a + s.v.b : s.v.a - s.v.b; assert.ok(e >= 0 && e <= 20, `${ch.id} line ${s.v.a}${s.v.op}${s.v.b}`); }
     if (s.v.t === 'blocks') assert.ok(s.v.a >= 0 && s.v.b >= 0 && (s.v.op === '+' ? s.v.a + s.v.b <= 10 : s.v.b <= s.v.a && s.v.a <= 10), `${ch.id} blocks`);

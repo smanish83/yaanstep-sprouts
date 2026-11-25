@@ -40,3 +40,6 @@ $('exit').onclick = () => { try { speechSynthesis.cancel(); } catch { /* ok */ }
 $('keep').onclick = () => { taps = -1000; $('alldone').hidden = true; };
 $('stop').onclick = () => { $('alldone').hidden = true; menu(); };
 menu();
+
+// Offline after the first visit (only on the hosted page; ignored when opened as a file).
+try { if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('/sw.js').catch(() => {}); } catch { /* no offline cache */ }

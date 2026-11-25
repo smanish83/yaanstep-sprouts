@@ -1,7 +1,8 @@
 // Yaanstep Sprouts maths puzzle generator (draft, on-device, no data stored).
 // A puzzle is fully determined by (band, kind, seed), so nothing needs to be stored.
 export type AgeBand = '3-4' | '5-6' | '7-8' | '9-10' | '11-12';
-export type Kind = 'add' | 'subtract' | 'multiply' | 'divide' | 'missing' | 'compare' | 'three' | 'order';
+import { makeIdea, IDEA_KINDS, type IdeaKind, type IdeaOpts } from './ideas.ts';
+export type Kind = 'add' | 'subtract' | 'multiply' | 'divide' | 'missing' | 'compare' | 'three' | 'order' | IdeaKind;
 export interface Puzzle { id: string; band: AgeBand; kind: Kind; prompt: string; answer: number; choices: number[]; }
 
 export const BANDS: AgeBand[] = ['3-4', '5-6', '7-8', '9-10', '11-12'];
@@ -22,11 +23,12 @@ const int = (r: () => number, lo: number, hi: number) => lo + Math.floor(r() * (
 
 export function kindsFor(band: AgeBand): Kind[] { return KINDS[band]; }
 
-export interface Opts { sumMax?: number; max?: number; lim?: number; total?: number; factors?: number[] }
+export interface Opts extends IdeaOpts { sumMax?: number; lim?: number; total?: number; factors?: number[] }
 export function makePuzzle(band: AgeBand, kind: Kind, seed: number, opts?: Opts): Puzzle {
   const r = rng(seed * 31 + BANDS.indexOf(band) * 7 + 1);
   const max = opts?.max ?? MAX[band];
   let prompt = '', answer = 0; let must: number[] = []; // numbers that must be among the choices
+  if ((IDEA_KINDS as string[]).includes(kind)) { const o = makeIdea(kind as IdeaKind, r, { ...opts, max: opts?.max ?? MAX[band] }); prompt = o.prompt; answer = o.answer; must = o.must ?? []; const ch = new Set<number>([answer, ...must].slice(0, 4)); const spread = Math.max(2, Math.round(answer * 0.2)); let g = 0; while (ch.size < 4 && g++ < 50) { const c = answer + int(r, -spread, spread); if (c >= 0 && c !== answer) ch.add(c); } let n2 = 1; while (ch.size < 4) ch.add(answer + n2++); return { id: `${band}:${kind}:${seed}`, band, kind, prompt, answer, choices: [...ch].sort((x, y) => x - y) }; }
   if (kind === 'add') { let a: number, b: number; if (opts?.sumMax) { a = int(r, 1, opts.sumMax - 1); b = int(r, 1, opts.sumMax - a); } else { a = int(r, 1, max); b = int(r, 1, max); } prompt = `${a} + ${b} = ?`; answer = a + b; }
   else if (kind === 'subtract') { const a = int(r, 2, max); const b = int(r, 1, a - 1); prompt = `${a} - ${b} = ?`; answer = a - b; }
   else if (kind === 'multiply') { const lim = opts?.lim ?? (band === '7-8' ? 10 : band === '9-10' ? 12 : 25); const a = int(r, 2, lim); const b = opts?.factors ? opts.factors[Math.floor(r() * opts.factors.length)] : int(r, 2, lim); prompt = `${a} x ${b} = ?`; answer = a * b; }

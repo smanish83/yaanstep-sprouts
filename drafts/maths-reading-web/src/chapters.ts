@@ -1,7 +1,8 @@
 // Chapters: a short tutorial first (worked example), then 10 questions that start easy and get harder.
 // Teaching ideas used (our own wording, no method names on screen): concrete objects, then pictures
 // (ten-frames, number lines, bar models, arrays), then numbers; small steps; repeat until secure.
-import { makePuzzle, type AgeBand, type Kind, type Opts } from './maths.ts';
+import { makePuzzle, rng, type AgeBand, type Kind, type Opts } from './maths.ts';
+import { IDEA_KINDS, FRAC_WORD } from './ideas.ts';
 import { difficulty, pictureDifficulty } from './progression.ts';
 import { makePicturePuzzle, type PicKind } from './picture.ts';
 import { makeFrame, type Item } from './games.ts';
@@ -46,6 +47,36 @@ M('11-12', 'Making change (bigger)', 'change', [1255, 2000], { maxPrice: 17 });
 M('11-12', 'Clock: any minute', 'clock', [7, 24], { step: 1 });
 M('11-12', 'How long will it take?', 'elapsed', [2, 15, 50], {});
 
+// More maths ideas (added after the earlier chapters so saved progress still lines up).
+const X = (band: AgeBand, title: string, kind: Kind, ex: number[], opts?: Opts) => { CHAPTERS[band].push(C(band, CHAPTERS[band].length, title, kind, ex, opts)); };
+X('5-6', 'Doubles', 'double', [4], { max: 12 });
+X('5-6', 'Halves', 'half', [8], { max: 24 });
+X('5-6', 'Make ten, then add', 'maketen', [8, 5]);
+X('5-6', 'Both sides equal (balance)', 'balance', [3, 4, 5], { max: 10 });
+X('5-6', 'Number families', 'family', [3, 4], { max: 10 });
+X('5-6', 'Story problems', 'word', [8, 5], { max: 10 });
+X('7-8', 'Doubles and halves', 'double', [25], { max: 50 });
+X('7-8', 'Halves of bigger numbers', 'half', [36], { max: 100 });
+X('7-8', 'Both sides equal (balance)', 'balance', [30, 40, 25], { max: 100 });
+X('7-8', 'Number families with × and ÷', 'family', [3, 4], { mul: true });
+X('7-8', 'Hundreds, tens and ones', 'place', [3, 4, 5], { digits: 3 });
+X('7-8', 'Halves, thirds and quarters', 'fraction', [4, 3], { dens: [2, 3, 4], max: 40 });
+X('7-8', 'Story problems', 'word', [47, 26], { max: 100 });
+X('7-8', 'Bar models: more and fewer', 'barword', [7, 5], { max: 50 });
+X('9-10', 'Doubling and halving in your head', 'double', [45], { max: 100 });
+X('9-10', 'Halving in your head', 'half', [84], { max: 200 });
+X('9-10', 'Place value to 9999', 'place', [3, 4, 5, 6], { digits: 4 });
+X('9-10', 'Fractions of amounts', 'fraction', [4, 5, 3], { dens: [2, 3, 4, 5, 10], nums: true, max: 100 });
+X('9-10', 'Balance: bigger numbers', 'balance', [120, 80, 150], { max: 500 });
+X('9-10', 'Story problems: all four operations', 'word', [6, 12], { mul: true, max: 500 });
+X('9-10', 'Bar models: more and fewer', 'barword', [120, 45], { max: 500 });
+X('11-12', 'Place value to 999,999', 'place', [4, 8, 2, 7, 5, 3], { digits: 6 });
+X('11-12', 'Fractions of amounts', 'fraction', [4, 15, 3], { dens: [2, 3, 4, 5, 10], nums: true, max: 300 });
+X('11-12', 'Balance: big numbers', 'balance', [1200, 800, 1500], { max: 5000 });
+X('11-12', 'Two-step story problems', 'word', [45, 28, 19], { two: true, max: 200 });
+X('11-12', 'Story problems with × and ÷', 'word', [8, 25], { mul: true, max: 1000 });
+X('11-12', 'Bar models: more and fewer', 'barword', [1250, 480], { max: 5000 });
+
 function spread<T>(sorted: T[], count: number): T[] { return Array.from({ length: count }, (_, i) => sorted[Math.round((i * (sorted.length - 1)) / (count - 1))]); }
 // 10 questions for a chapter, easy to harder. Same base gives the same ten.
 export function chapterQuestions(ch: Chapter, base: number, n: number = QUESTIONS_PER_CHAPTER): Item[] {
@@ -64,6 +95,8 @@ export function chapterQuestions(ch: Chapter, base: number, n: number = QUESTION
   }
   const seen = new Set<string>(); const pool = [] as ReturnType<typeof makePuzzle>[];
   for (let i = 0; i < 2000 && pool.length < 80; i++) { const p = makePuzzle(ch.band, ch.kind as Kind, base * 1000 + i, ch.opts); if (!seen.has(p.prompt)) { seen.add(p.prompt); pool.push(p); } }
+  // A small set of possible puzzles would give the same ten every time, so pick a random handful first.
+  if (pool.length < 80 && pool.length > n) { const r = rng(base * 977 + 13); for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; } pool.length = Math.min(pool.length, Math.max(n, Math.floor(pool.length * 0.6))); }
   pool.sort((a, b) => difficulty(a) - difficulty(b) || (a.id < b.id ? -1 : 1));
   return spread(pool, n).map(p => ({ kind: 'num' as const, p }));
 }
@@ -78,6 +111,7 @@ export type V =
   | { t: 'array'; rows: number; cols: number }
   | { t: 'bars'; a: number; b: number }
   | { t: 'text'; big: string }
+  | { t: 'balance'; left: string; right: string }
   | { t: 'money'; coins?: number[]; bills?: number[]; tag?: number; hide?: boolean }
   | { t: 'clock'; h: number; m: number; pointer?: 'hour' | 'minute' }
   | { t: 'none' };
@@ -125,10 +159,77 @@ function measSteps(ch: Chapter): Step[] {
   }
   void z; return s;
 }
+
+function ideaSteps(ch: Chapter): Step[] {
+  const [x, y, z] = ch.ex; const k = ch.kind; const s: Step[] = [];
+  if (k === 'double') {
+    s.push({ say: `Doubling means two of the same number. Double ${x} is ${x} and ${x} together.`, v: x <= 10 ? { t: 'objects', parts: [{ n: x, color: 'red', shape: 'circle' }, { n: x, color: 'blue', shape: 'circle' }], sign: '+' } : { t: 'bar', total: 2 * x, a: x, b: x } },
+      { say: `${x} + ${x} = ${2 * x}. So double ${x} is ${2 * x}.`, v: { t: 'text', big: `${x} + ${x} = ${2 * x}` } },
+      { say: `Doubles help with other sums. Since double ${x} is ${2 * x}, ${x} + ${x + 1} is just one more: ${2 * x + 1}.`, v: { t: 'text', big: `${x} + ${x + 1} = ${2 * x + 1}` } });
+  } else if (k === 'half') {
+    const h = x / 2;
+    s.push({ say: `Half means sharing into two equal groups. Here are ${x} shared between two groups.`, v: x <= 20 ? { t: 'objects', parts: [{ n: h, color: 'red', shape: 'circle' }, { n: h, color: 'blue', shape: 'circle' }], sign: '|' } : { t: 'bar', total: x, a: h, b: h } },
+      { say: `Each group has ${h}. Half of ${x} is ${h}.`, v: { t: 'text', big: `${h} + ${h} = ${x}` } },
+      { say: `Halving is the opposite of doubling. Double ${h} is ${x}.`, v: { t: 'text', big: `${x} ÷ 2 = ${h}` } });
+  } else if (k === 'maketen') {
+    const t = 10 - x, rest = y! - t;
+    s.push({ say: `To add ${x} + ${y}, make ten first. ${x} needs ${t} more to fill the ten frame.`, v: { t: 'frame', filled: x, extra: t } },
+      { say: `Take ${t} from the ${y}. What is left of the ${y}? ${y} − ${t} = ${rest}.`, v: { t: 'bar', total: y!, a: t, b: rest } },
+      { say: `Now add: ${x} + ${t} = 10.`, v: { t: 'text', big: `${x} + ${t} = 10` } }, { say: `Then add what is left over: 10 + ${rest} = ${x + y!}.`, v: { t: 'text', big: `10 + ${rest} = ${x + y!}` } },
+      { say: `So ${x} + ${y} = ${x + y!}. Making ten first is quick and easy.`, v: { t: 'text', big: `${x} + ${y} = ${x + y!}` } });
+  } else if (k === 'balance') {
+    const T = x + y!, c = z!, m = T - c;
+    s.push({ say: 'The equals sign is like a balance. Both sides must be worth the same, so the balance stays level.', v: { t: 'balance', left: `${x} + ${y}`, right: `${T}` } },
+      { say: `Here the right side has a missing number. First work out the left side: ${x} + ${y} = ${T}.`, v: { t: 'balance', left: `${x} + ${y}`, right: `? + ${c}` } },
+      { say: `The right side must be ${T} too. ${T} − ${c} = ${m}. The missing number is ${m}.`, v: { t: 'text', big: `${T} − ${c} = ${m}` } },
+      { say: `Check: ${m} + ${c} = ${T}. Both sides are ${T}, so it balances.`, v: { t: 'balance', left: `${x} + ${y}`, right: `${m} + ${c}` } });
+  } else if (k === 'family') {
+    if (ch.opts?.mul) { const p = x * y!;
+      s.push({ say: `Some numbers belong to a family. ${x}, ${y} and ${p} go together.`, v: x <= 10 && y! <= 10 ? { t: 'array', rows: x, cols: y! } : { t: 'text', big: `${x}  ${y}  ${p}` } },
+        { say: `Multiplying: ${x} × ${y} = ${p}, and ${y} × ${x} = ${p}.`, v: { t: 'text', big: `${x} × ${y} = ${p}` } }, { say: `Dividing goes back the other way: ${p} ÷ ${x} = ${y}, and ${p} ÷ ${y} = ${x}.`, v: { t: 'text', big: `${p} ÷ ${x} = ${y}` } },
+        { say: 'If you know one fact, you know the whole family.', v: { t: 'none' } });
+    } else { const p = x + y!;
+      s.push({ say: `Some numbers belong to a family. ${x}, ${y} and ${p} go together.`, v: { t: 'bar', total: p, a: x, b: y! } },
+        { say: `Adding: ${x} + ${y} = ${p}, and ${y} + ${x} = ${p}.`, v: { t: 'text', big: `${x} + ${y} = ${p}` } }, { say: `Taking away goes back: ${p} − ${x} = ${y}, and ${p} − ${y} = ${x}.`, v: { t: 'text', big: `${p} − ${x} = ${y}` } },
+        { say: 'If you know one fact, you know the whole family.', v: { t: 'none' } }); }
+  } else if (k === 'place') {
+    const ds = ch.ex; const nd = ds.length; const n = Number(ds.join('')); const names = ['ones', 'tens', 'hundreds', 'thousands', 'ten-thousands', 'hundred-thousands'];
+    const vals = ds.map((d, i) => d * 10 ** (nd - 1 - i)); const fmt = (v: number) => v.toLocaleString('en-US');
+    s.push({ say: `Every digit in a number has a place. Here is ${fmt(n)}.`, v: { t: 'text', big: fmt(n) } },
+      { say: `The ${ds[nd - 1]} is in the ones place. The ${ds[nd - 2]} is in the ${names[1]} place, so it is worth ${fmt(vals[nd - 2])}.`, v: { t: 'text', big: `${ds[nd - 2]} ${names[1]} = ${fmt(vals[nd - 2])}` } },
+      { say: `The ${ds[0]} is in the ${names[nd - 1]} place, so it is worth ${fmt(vals[0])}.`, v: { t: 'text', big: `${ds[0]} ${names[nd - 1]} = ${fmt(vals[0])}` } },
+      { say: `Add the values to build the number: ${vals.map(fmt).join(' + ')} = ${fmt(n)}.`, v: { t: 'text', big: `${vals.map(fmt).join(' + ')} = ${fmt(n)}` } });
+  } else if (k === 'fraction') {
+    const d = x, kk = y!, amt = d * kk; const w = FRAC_WORD[d].toLowerCase(); const num = ch.ex[2];
+    s.push({ say: `To find ${w} of ${amt}, share ${amt} into ${d} equal groups.`, v: d <= 10 && kk <= 10 ? { t: 'array', rows: d, cols: kk } : { t: 'text', big: `${amt} ÷ ${d}` } },
+      { say: `Each group has ${kk}. ${amt} ÷ ${d} = ${kk}. So ${w} of ${amt} is ${kk}.`, v: { t: 'text', big: `${amt} ÷ ${d} = ${kk}` } });
+    if (num) s.push({ say: `For ${num}/${d} of ${amt}, take ${num} of the groups: ${num} × ${kk} = ${num * kk}.`, v: { t: 'text', big: `${num} × ${kk} = ${num * kk}` } });
+    else s.push({ say: `Check: ${kk} × ${d} = ${amt}.`, v: { t: 'text', big: `${kk} × ${d} = ${amt}` } });
+  } else if (k === 'word') {
+    s.push({ say: 'A story problem hides a sum. Read it slowly. What do you know? What do you need to find?', v: { t: 'none' } });
+    if (ch.opts?.two) { const a = x, b = y!, c = z!;
+      s.push({ say: `Mia has ${a} stickers. She gets ${b} more, then gives away ${c}. Do it in two steps.`, v: { t: 'bar', total: null, a, b } }, { say: `Step 1, getting more means add: ${a} + ${b} = ${a + b}.`, v: { t: 'text', big: `${a} + ${b} = ${a + b}` } },
+        { say: `Step 2, giving away means take away: ${a + b} − ${c} = ${a + b - c}.`, v: { t: 'text', big: `${a + b} − ${c} = ${a + b - c}` } }, { say: `Mia has ${a + b - c} stickers left. Check that this answers the question.`, v: { t: 'none' } });
+    } else if (ch.opts?.mul) { const g = x, kk = y!;
+      s.push({ say: `There are ${g} bags with ${kk} pencils in each bag. How many pencils in all?`, v: g <= 10 && kk <= 10 ? { t: 'array', rows: g, cols: kk } : { t: 'text', big: `${g} groups of ${kk}` } },
+        { say: `Equal groups mean multiply: ${g} × ${kk} = ${g * kk}.`, v: { t: 'text', big: `${g} × ${kk} = ${g * kk}` } }, { say: `Sharing equally means divide. ${g * kk} pencils shared between ${g} children: ${g * kk} ÷ ${g} = ${kk} each.`, v: { t: 'text', big: `${g * kk} ÷ ${g} = ${kk}` } });
+    } else { const a = x, b = y!;
+      s.push({ say: `Asha has ${a} stickers. She finds ${b} more. How many now? Two parts make a whole.`, v: { t: 'bar', total: null, a, b } }, { say: `Putting together means add: ${a} + ${b} = ${a + b}.`, v: { t: 'bar', total: a + b, a, b } },
+        { say: `If she gave ${b} away instead, that is taking away: ${a + b} − ${b} = ${a}.`, v: { t: 'text', big: `${a + b} − ${b} = ${a}` } }); }
+  } else if (k === 'barword') {
+    const a = x, d = y!;
+    s.push({ say: `Draw a bar to see the story. Asha has ${a + d} stickers, ${d} more than Ben. How many does Ben have?`, v: { t: 'bar', total: a + d, a: null, b: d } },
+      { say: `Asha's bar is Ben's bar plus the extra ${d}. So take the extra away: ${a + d} − ${d} = ${a}.`, v: { t: 'text', big: `${a + d} − ${d} = ${a}` } },
+      { say: `Ben has ${a}. Check: ${a} + ${d} = ${a + d}.`, v: { t: 'bar', total: a + d, a, b: d } },
+      { say: 'The same bar helps with "fewer" stories too. Draw it, find the parts, then add or take away.', v: { t: 'none' } });
+  }
+  return s;
+}
 export function tutorialFor(ch: Chapter): Step[] {
   const [x, y, z] = ch.ex; const k = ch.kind; const small = (n: number) => n <= 20;
   const st: Step[] = [{ say: `Let us learn: ${ch.title.replace(/[.?!]+$/, '')}.`, v: { t: 'none' } }];
   if (isMeas(k)) { st.push(...measSteps(ch)); st.push(start); return st; }
+  if ((IDEA_KINDS as string[]).includes(k as string)) { st.push(...ideaSteps(ch)); st.push(start); return st; }
   if (k === 'count') { st.push({ say: `Here are ${x} red circles. Touch each one and count out loud.`, v: { t: 'objects', parts: [{ n: x, color: 'red', shape: 'circle' }], tap: true } }, { say: `The last number you say is how many. There are ${x}.`, v: { t: 'text', big: String(x) } }); }
   else if (k === 'onemore') { st.push({ say: `Here are ${x} blue stars.`, v: { t: 'objects', parts: [{ n: x, color: 'blue', shape: 'star' }] } }, { say: `Add one more star. Now there are ${x + 1}.`, v: { t: 'objects', parts: [{ n: x, color: 'blue', shape: 'star' }, { n: 1, color: 'orange', shape: 'star' }], sign: '+' } }, { say: `One more than ${x} is ${x + 1}.`, v: { t: 'text', big: `${x} + 1 = ${x + 1}` } }); }
   else if (k === 'more') { st.push({ say: `Here are two groups. The first group has ${x}. The second group has ${y}.`, v: { t: 'objects', parts: [{ n: x, color: 'green', shape: 'square' }, { n: y, color: 'purple', shape: 'square' }], sign: '|' } }, { say: `${y} is more than ${x}, so the second group has more.`, v: { t: 'bars', a: x, b: y } }); }
